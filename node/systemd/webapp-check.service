@@ -1,0 +1,9 @@
+[Unit]
+Description=Write webapp_up metric for Node Exporter textfile collector
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/webapp-check
+ExecStart=/usr/local/bin/check_webapp.sh

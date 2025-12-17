@@ -1,0 +1,5 @@
+groups:
+  - name: webappdown
+    rules:
+    - alert: WebAppDown
+      expr: 

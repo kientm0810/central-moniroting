@@ -1,0 +1,14 @@
+[
+  {
+    "targets": [
+      "host.docker.internal:9101",
+      "localhost:9102",
+      "localhost:9103"
+    ],
+    "labels": [
+      "server1",
+      "server2",
+      "server3"
+    ]
+  }
+]

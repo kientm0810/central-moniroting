@@ -1,0 +1,149 @@
+services:
+  # ===================== srv1 =====================
+  srv1-webapp:
+    image: nginx:alpine
+    container_name: srv1-webapp
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+
+  srv1-webapp-check:
+    image: curlimages/curl:8.6.0
+    container_name: srv1-webapp-check
+    restart: unless-stopped
+    volumes:
+      - srv1_textfile:/textfile
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      set -eu
+      CHECK_URL="http://srv1-webapp/"
+      INTERVAL="5"
+      TIMEOUT="2"
+      OUT="/textfile/webapp.prom"
+      while true; do
+        if curl -fsS --max-time "$${TIMEOUT}" "$${CHECK_URL}" >/dev/null 2>&1; then up=1; else up=0; fi
+        tmp="$${OUT}.tmp"
+        {
+          echo "# HELP webapp_up Web application healthcheck (1=up, 0=down)"
+          echo "# TYPE webapp_up gauge"
+          echo "webapp_up{server=\"srv1\",url=\"$${CHECK_URL}\"} $${up}"
+        } > "$${tmp}"
+        mv "$${tmp}" "$${OUT}"
+        sleep "$${INTERVAL}"
+      done
+    depends_on:
+      - srv1-webapp
+
+  srv1-node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: srv1-node-exporter
+    restart: unless-stopped
+    command:
+      - --collector.textfile.directory=/textfile
+    volumes:
+      - srv1_textfile:/textfile:ro
+    ports:
+      - "9101:9100"
+    depends_on:
+      - srv1-webapp-check
+
+  # ===================== srv2 =====================
+  srv2-webapp:
+    image: nginx:alpine
+    container_name: srv2-webapp
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+
+  srv2-webapp-check:
+    image: curlimages/curl:8.6.0
+    container_name: srv2-webapp-check
+    restart: unless-stopped
+    volumes:
+      - srv2_textfile:/textfile
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      set -eu
+      CHECK_URL="http://srv2-webapp/"
+      INTERVAL="5"
+      TIMEOUT="2"
+      OUT="/textfile/webapp.prom"
+      while true; do
+        if curl -fsS --max-time "$${TIMEOUT}" "$${CHECK_URL}" >/dev/null 2>&1; then up=1; else up=0; fi
+        tmp="$${OUT}.tmp"
+        {
+          echo "# HELP webapp_up Web application healthcheck (1=up, 0=down)"
+          echo "# TYPE webapp_up gauge"
+          echo "webapp_up{server=\"srv2\",url=\"$${CHECK_URL}\"} $${up}"
+        } > "$${tmp}"
+        mv "$${tmp}" "$${OUT}"
+        sleep "$${INTERVAL}"
+      done
+    depends_on:
+      - srv2-webapp
+
+  srv2-node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: srv2-node-exporter
+    restart: unless-stopped
+    command:
+      - --collector.textfile.directory=/textfile
+    volumes:
+      - srv2_textfile:/textfile:ro
+    ports:
+      - "9102:9100"
+    depends_on:
+      - srv2-webapp-check
+
+  # ===================== srv3 =====================
+  srv3-webapp:
+    image: nginx:alpine
+    container_name: srv3-webapp
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+
+  srv3-webapp-check:
+    image: curlimages/curl:8.6.0
+    container_name: srv3-webapp-check
+    restart: unless-stopped
+    volumes:
+      - srv3_textfile:/textfile
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      set -eu
+      CHECK_URL="http://srv3-webapp/"
+      INTERVAL="5"
+      TIMEOUT="2"
+      OUT="/textfile/webapp.prom"
+      while true; do
+        if curl -fsS --max-time "$${TIMEOUT}" "$${CHECK_URL}" >/dev/null 2>&1; then up=1; else up=0; fi
+        tmp="$${OUT}.tmp"
+        {
+          echo "# HELP webapp_up Web application healthcheck (1=up, 0=down)"
+          echo "# TYPE webapp_up gauge"
+          echo "webapp_up{server=\"srv3\",url=\"$${CHECK_URL}\"} $${up}"
+        } > "$${tmp}"
+        mv "$${tmp}" "$${OUT}"
+        sleep "$${INTERVAL}"
+      done
+    depends_on:
+      - srv3-webapp
+
+  srv3-node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: srv3-node-exporter
+    restart: unless-stopped
+    command:
+      - --collector.textfile.directory=/textfile
+    volumes:
+      - srv3_textfile:/textfile:ro
+    ports:
+      - "9103:9100"
+    depends_on:
+      - srv3-webapp-check
+
+volumes:
+  srv1_textfile:
+  srv2_textfile:
+  srv3_textfile:
