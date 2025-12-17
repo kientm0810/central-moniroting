@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  web:
+    build: ./webapp
+    container_name: server1-web
+    networks:
+      - monitoring-net
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: server1-node
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - monitoring-net
+
+networks:
+  monitoring-net:
+    external: true

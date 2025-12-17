@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - monitoring-net
+
+networks:
+  monitoring-net:
+    external: true
